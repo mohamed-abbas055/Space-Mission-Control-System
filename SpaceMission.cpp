@@ -2,75 +2,76 @@
 #include <string>
 using namespace std;
 
+
 class Rocket;
 class Astronaut;
 
-class SpaceObject {                                                       //  CLASS 1 :  (Abstract Base Class)
 
+
+
+class SpaceObject {                    //  CLASS 1 :  Abstract  Class                        
 protected:
     string name;
     int    id;
-    double weight;                                                            // tons
+    double weight;                    // tons
 
 public:
-    SpaceObject() : name("Unknown"), id(0), weight(0.0) {}                                    // Constructor
-    SpaceObject(string n, int i, double w) : name(n), id(i), weight(w) {}                // Constructor
+    SpaceObject() : name("Unknown"), id(0), weight(0.0) {}
+    SpaceObject(string n, int i, double w) : name(n), id(i), weight(w) {}
 
-       virtual void input() {
-        cout << "  Enter name   : ";                       cin >> name;
-        cout << "  Enter ID     : ";                            cin >> id;
-        cout << "  Enter weight : ";                        cin >> weight;
-}
-
+    
+    virtual void input() {
+        cout << "  Enter name   : ";                cin >> name;
+        cout << "  Enter ID     : ";                cin >> id;
+        cout << "  Enter weight (tons): ";          cin >> weight;
+    }
     virtual void display() const {
         cout << "  Name   : " << name   << "\n"
              << "  ID     : " << id     << "\n"
-             << "  Weight : " << weight << " tons\n";
-}
-
-    virtual double calculateFuel() const = 0;                                                 // pure virtual
-
- string getName() const { return name; }
+             << "  Weight : " << weight << " \n";
+    }
     
-int    getId()   const { return id;   }
-
- double getWeight() const { return weight; }
+    virtual double calculateFuel()  const = 0;                  // pure virtual
 
 
-    virtual ~SpaceObject() {}                                                                          // destructor
+    string getName() const { return name; }
+    int    getId()   const { return id;   }
+    double getWeight() const { return weight; }
+
+    virtual ~SpaceObject() {}
 };
 
 
-class Rocket : public SpaceObject {                                                      //  CLASS 2 :  (inherits SpaceObject)
 
+class Rocket : public SpaceObject {                    //  CLASS 2 : (inherits SpaceObject)
 private:
     int    thrustLevel;   
-    double fuelCapacity; 
-    string status;        
+    double fuelCapacity;  
+    string status;       
 
 public:
     Rocket() : SpaceObject(), thrustLevel(1), fuelCapacity(0.0), status("Ready") {}
     Rocket(string n, int i, double w, int t, double fc, string s)
         : SpaceObject(n, i, w), thrustLevel(t), fuelCapacity(fc), status(s) {}
 
-  
+    
     void input() override {
         SpaceObject::input();
-        cout << "  Enter thrust level (1-10): ";                                                         cin >> thrustLevel;
-        cout << "  Enter fuel capacity (tons): ";                                                       cin >> fuelCapacity;
-        cout << "  Enter status (Ready/InFlight/Maintenance): ";                        cin >> status;
+        cout << "  Enter thrust level (1-10): ";                                cin >> thrustLevel;
+        cout << "  Enter fuel capacity (tons): ";                               cin >> fuelCapacity;
+        cout << "  Enter status (Ready/InFlight/Maintenance): ";                cin >> status;
     }
 
     void display() const override {
         SpaceObject::display();
-
+      
         cout << "  Thrust Level  : " << thrustLevel  << "\n"
-             << "  Fuel Capacity : " << fuelCapacity << " tons\n"
+             << "  Fuel Capacity : " << fuelCapacity << "\n"
              << "  Status        : " << status       << "\n";
     }
 
-    
-    double calculateFuel() const override {                                // Fuel needed = weight * thrustLevel * 0.5
+    // Fuel needed = weight * thrustLevel * 0.5
+    double calculateFuel() const override {
         return weight * thrustLevel * 0.5;
     }
 
@@ -87,16 +88,15 @@ public:
     // --- Friend Function (declared here, defined below) ---
     friend void showMissionSummary(const Rocket& r, const Astronaut& a);
 
-  
-  int    getThrustLevel()  const { return thrustLevel;  }
-
+    int    getThrustLevel()  const { return thrustLevel;  }
     double getFuelCapacity() const { return fuelCapacity; }
- 
-   string getStatus()       const { return status;       }
+    string getStatus()       const { return status;       }
 };
 
-class Astronaut : public SpaceObject {                        //  CLASS 3 :   (inherits SpaceObject)
 
+
+
+class Astronaut : public SpaceObject {                              //  CLASS 3 :  (inherits SpaceObject)
 protected:
     string rank;
     int    missionsCompleted;
@@ -110,15 +110,15 @@ public:
     
     void input() override {
         SpaceObject::input();
-        cout << "  Enter rank    : ";                                         cin >> rank;
-        cout << "  Enter missions completed: ";                  cin >> missionsCompleted;
-        cout << "  Enter health score (0-100): ";                   cin >> healthScore;
+        cout << "  Enter rank    : ";                                          cin >> rank;
+        cout << "  Enter missions completed: ";                                cin >> missionsCompleted;
+        cout << "  Enter health score (0-100): ";                              cin >> healthScore;
     }
 
     void display() const override {
- 
-        SpaceObject::display();
-        cout << "  Rank               : " << rank               << "\n"
+         SpaceObject::display();
+        
+         cout << "  Rank               : " << rank               << "\n"
              << "  Missions Completed : " << missionsCompleted  << "\n"
              << "  Health Score       : " << healthScore        << "\n";
     }
@@ -133,17 +133,17 @@ public:
         return healthScore >= 75.0 && missionsCompleted >= 1;
     }
 
-   string getRank()             const { return rank;             }
-    
-int    getMissions()         const { return missionsCompleted;}
-  
-  double getHealthScore()      const { return healthScore;      }
+    string getRank()             const { return rank;             }
+    int    getMissions()         const { return missionsCompleted;}
+    double getHealthScore()      const { return healthScore;      }
 
     friend void showMissionSummary(const Rocket& r, const Astronaut& a);
 };
 
-class Commander : public Astronaut {                           //  CLASS 4 :   (inherits Astronaut)
 
+
+
+class Commander : public Astronaut {                             //  CLASS 4 :  (inherits Astronaut)
 private:
     string missionCode;
     int    crewSize;
@@ -154,15 +154,17 @@ public:
               string mc, int cs)
         : Astronaut(n, i, w, r, m, h), missionCode(mc), crewSize(cs) {}
 
+    
     void input() override {
         Astronaut::input();
-        cout << "  Enter mission code  : ";                        cin >> missionCode;
-        cout << "  Enter crew size     : ";                            cin >> crewSize;
+        cout << "  Enter mission code  : "; cin >> missionCode;
+        cout << "  Enter crew size     : "; cin >> crewSize;
     }
 
     void display() const override {
         Astronaut::display();
-        cout  << "  Mission Code : " << missionCode << "\n"
+        cout << "  [Commander]\n"
+             << "  Mission Code : " << missionCode << "\n"
              << "  Crew Size    : " << crewSize    << "\n";
     }
 
@@ -180,13 +182,12 @@ public:
     int    getCrewSize()    const { return crewSize;    }
 };
 
-// ============================================================
+
 //  FRIEND FUNCTION  (accesses private/protected of both)
-// ============================================================
+
 void showMissionSummary(const Rocket& r, const Astronaut& a) {
-    cout << "\n  ========================================\n";
-    cout << "       MISSION SUMMARY (Friend Function)\n";
-    cout << "  ========================================\n";
+    
+   
     cout << "  Rocket  : " << r.name   << "  (ID: " << r.id   << ")\n";
     cout << "  Pilot   : " << a.name   << "  (ID: " << a.id   << ")\n";
     cout << "  Pilot Rank     : " << a.rank           << "\n";
@@ -194,12 +195,12 @@ void showMissionSummary(const Rocket& r, const Astronaut& a) {
     cout << "  Rocket Status  : " << r.status          << "\n";
     cout << "  Fuel Needed    : " << r.calculateFuel() << " tons\n";
     cout << "  Eligible?      : " << (a.isEligible() ? "YES" : "NO") << "\n";
-    cout << "  ========================================\n";
+ 
 }
 
-// ============================================================
+
 //  GLOBAL ARRAYS OF OBJECTS
-// ============================================================
+
 const int MAX_ROCKETS    = 5;
 const int MAX_ASTRONAUTS = 5;
 const int MAX_COMMANDERS = 5;
@@ -212,9 +213,8 @@ int rocketCount    = 0;
 int astronautCount = 0;
 int commanderCount = 0;
 
-// ============================================================
 //  HELPER : print header
-// ============================================================
+
 void printHeader(const string& title) {
     cout << "\n  ==========================================\n";
     cout << "     " << title << "\n";
