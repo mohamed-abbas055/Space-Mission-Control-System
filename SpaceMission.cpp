@@ -38,7 +38,7 @@ public:
     int    getId()   const { return id;   }
     double getWeight() const { return weight; }
 
-    virtual ~SpaceObject() {}
+    virtual ~SpaceObject() {}                                 // virtual destructor
 };
 
 
@@ -56,7 +56,7 @@ public:
 
     
     void input() override {
-        SpaceObject::input();
+                                                             SpaceObject::input();
         cout << "  Enter thrust level (1-10): ";                                cin >> thrustLevel;
         cout << "  Enter fuel capacity (tons): ";                               cin >> fuelCapacity;
         cout << "  Enter status (Ready/InFlight/Maintenance): ";                cin >> status;
@@ -70,22 +70,22 @@ public:
              << "  Status        : " << status       << "\n";
     }
 
-    // Fuel needed = weight * thrustLevel * 0.5
-    double calculateFuel() const override {
+   
+    double calculateFuel() const override {                  //  weight * thrustLevel * 0.5      
         return weight * thrustLevel * 0.5;
     }
 
-    // --- Overloading : compare two rockets by fuel needed ---
+    
     bool operator>(const Rocket& other) const {
         return calculateFuel() > other.calculateFuel();
     }
 
-    // --- Overloading : add fuel capacities ---
+    
     double operator+(const Rocket& other) const {
         return fuelCapacity + other.fuelCapacity;
     }
 
-    // --- Friend Function (declared here, defined below) ---
+    
     friend void showMissionSummary(const Rocket& r, const Astronaut& a);
 
     int    getThrustLevel()  const { return thrustLevel;  }
@@ -116,19 +116,19 @@ public:
     }
 
     void display() const override {
-         SpaceObject::display();
+                                                 SpaceObject::display();
         
          cout << "  Rank               : " << rank               << "\n"
              << "  Missions Completed : " << missionsCompleted  << "\n"
              << "  Health Score       : " << healthScore        << "\n";
     }
 
-    // Fuel per astronaut = 0.3 tons per mission
+    
     double calculateFuel() const override {
         return missionsCompleted * 0.3;
     }
 
-    // Check if eligible for mission
+    
     bool isEligible() const {
         return healthScore >= 75.0 && missionsCompleted >= 1;
     }
@@ -156,9 +156,9 @@ public:
 
     
     void input() override {
-        Astronaut::input();
-        cout << "  Enter mission code  : "; cin >> missionCode;
-        cout << "  Enter crew size     : "; cin >> crewSize;
+                                                     Astronaut::input();
+        cout << "  Enter mission code  : ";               cin >> missionCode;
+        cout << "  Enter crew size     : ";               cin >> crewSize;
     }
 
     void display() const override {
@@ -168,68 +168,60 @@ public:
              << "  Crew Size    : " << crewSize    << "\n";
     }
 
-    // Commander fuel = base + extra per crew member
+    
     double calculateFuel() const override {
         return Astronaut::calculateFuel() + crewSize * 0.15;
     }
 
-    // --- Overloading : add two commanders' crew sizes ---
-    int operator+(const Commander& other) const {
-        return crewSize + other.crewSize;
-    }
+    
 
     string getMissionCode() const { return missionCode; }
     int    getCrewSize()    const { return crewSize;    }
 };
 
 
-//  FRIEND FUNCTION  (accesses private/protected of both)
+
 
 void showMissionSummary(const Rocket& r, const Astronaut& a) {
     
    
-    cout << "  Rocket  : " << r.name   << "  (ID: " << r.id   << ")\n";
-    cout << "  Pilot   : " << a.name   << "  (ID: " << a.id   << ")\n";
+    cout << "  Rocket  : " << r.name   << "  ID: " << r.id   << "\n";
+    cout << "  Pilot   : " << a.name   << "  ID: " << a.id   << "\n";
     cout << "  Pilot Rank     : " << a.rank           << "\n";
     cout << "  Health Score   : " << a.healthScore     << "\n";
     cout << "  Rocket Status  : " << r.status          << "\n";
-    cout << "  Fuel Needed    : " << r.calculateFuel() << " tons\n";
-    cout << "  Eligible?      : " << (a.isEligible() ? "YES" : "NO") << "\n";
+    cout << "  Fuel Needed    : " << r.calculateFuel() << " \n";
+    cout << "  Eligible       : ";
+        if (a.isEligible()) {
+        cout << "YES" << endl;
+    }
+    else {
+        cout << "NO" << endl;
+    } 
  
 }
 
 
-//  GLOBAL ARRAYS OF OBJECTS
 
-const int MAX_ROCKETS    = 5;
-const int MAX_ASTRONAUTS = 5;
-const int MAX_COMMANDERS = 5;
+Rocket* rockets = nullptr;
+int rocketCount = 0;
+int rocketCapacity = 0;
 
-Rocket    rockets[MAX_ROCKETS];
-Astronaut astronauts[MAX_ASTRONAUTS];
-Commander commanders[MAX_COMMANDERS];
-
-int rocketCount    = 0;
+Astronaut* astronauts = nullptr;
 int astronautCount = 0;
+int astronautCapacity = 0;
+
+Commander* commanders = nullptr;
 int commanderCount = 0;
+int commanderCapacity = 0;
 
-//  HELPER : print header
 
-void printHeader(const string& title) {
-    cout << "\n  ==========================================\n";
-    cout << "     " << title << "\n";
-    cout << "  ==========================================\n";
-}
 
-// ============================================================
-//  MENU FUNCTIONS
-// ============================================================
 
-// --- MENU 1 : Rockets ---
-void rocketMenu() {
+void rocketMenu() {                                                      //  MENU 1         
     int choice;
     do {
-        printHeader("ROCKET MANAGEMENT");
+        
         cout << "  [1] Add Rocket\n"
              << "  [2] Display All Rockets\n"
              << "  [3] Compare Two Rockets (Fuel Needed)\n"
@@ -239,20 +231,27 @@ void rocketMenu() {
         cin >> choice;
 
         if (choice == 1) {
-            if (rocketCount >= MAX_ROCKETS) {
-                cout << "  Rocket list is full!\n";
-            } else {
-                cout << "\n  --- Enter Rocket Data ---\n";
+            if (rockets == nullptr) {
+                cout << " Enter how many rockets you want to store: \n";
+                cin >> rocketCapacity;
+                rockets = new Rocket[rocketCapacity];
+
+            } if (rocketCount >= rocketCapacity) {
+                cout << "  Full\n";
+            }
+            else {
+                cout << "Enter Rocket Data \n";
                 rockets[rocketCount].input();
                 rocketCount++;
-                cout << "  Rocket added successfully!\n";
+               
             }
+            
         }
         else if (choice == 2) {
-            if (rocketCount == 0) { cout << "  No rockets added yet.\n"; }
+            if (rocketCount == 0) { cout << "  No rockets \n"; }
             else {
                 for (int i = 0; i < rocketCount; i++) {
-                    cout << "\n  Rocket #" << (i+1);
+                    cout << "  Rocket " << (i+1);
                     rockets[i].display();
                 }
             }
@@ -264,7 +263,7 @@ void rocketMenu() {
                 if (rockets[0] > rockets[1])
                     cout << "  " << rockets[0].getName() << " needs MORE fuel.\n";
                 else
-                    cout << "  " << rockets[1].getName() << " needs MORE fuel.\n";
+                    cout <<  rockets[1].getName() << " needs MORE fuel.\n";
             }
         }
         else if (choice == 4) {
@@ -272,129 +271,138 @@ void rocketMenu() {
             else {
                 double total = rockets[0] + rockets[1];
                 cout << "  Combined fuel capacity of first two rockets: "
-                     << total << " tons\n";
+                     << total << " \n";
             }
         }
     } while (choice != 0);
 }
 
-// --- MENU 2 : Astronauts ---
-void astronautMenu() {
+void astronautMenu() {                                                            //  MENU 2                
     int choice;
     do {
-        printHeader("ASTRONAUT MANAGEMENT");
+        
+
         cout << "  [1] Add Astronaut\n"
-             << "  [2] Display All Astronauts\n"
-             << "  [3] Check Astronaut Eligibility\n"
-             << "  [0] Back\n"
-             << "  Choice: ";
+            << "  [2] Display All Astronauts\n"
+            << "  [3] Check Astronaut Eligibility\n"
+            << "  [0] Back\n"
+            << "  Choice: ";
         cin >> choice;
 
         if (choice == 1) {
-            if (astronautCount >= MAX_ASTRONAUTS) {
-                cout << "  Astronaut list is full!\n";
-            } else {
-                cout << "\n  --- Enter Astronaut Data ---\n";
+         
+            if (astronauts == nullptr) {
+                cout << "  Enter maximum number of astronauts: ";
+                cin >> astronautCapacity;
+                astronauts = new Astronaut[astronautCapacity];
+            }
+
+            if (astronautCount >= astronautCapacity) {
+                cout << "  Astronaut list is full \n";
+            }
+            else {
                 astronauts[astronautCount].input();
                 astronautCount++;
-                cout << "  Astronaut added successfully!\n";
+              
             }
         }
         else if (choice == 2) {
-            if (astronautCount == 0) { cout << "  No astronauts added yet.\n"; }
+            if (astronautCount == 0) {
+                cout << "  No astronauts added yet.\n";
+            }
             else {
                 for (int i = 0; i < astronautCount; i++) {
-                    cout << "\n  Astronaut #" << (i+1);
+                    cout << " Astronaut " << (i + 1);
                     astronauts[i].display();
+                  
                     cout << "  Fuel contribution: "
-                         << astronauts[i].calculateFuel() << " tons\n";
+                        << astronauts[i].calculateFuel() << " \n";
                 }
             }
         }
         else if (choice == 3) {
-            if (astronautCount == 0) { cout << "  No astronauts added yet.\n"; }
+            if (astronautCount == 0) {
+                cout << "  No astronauts added yet.\n";
+            }
             else {
+                
                 for (int i = 0; i < astronautCount; i++) {
-                    cout << "  " << astronauts[i].getName()
-                         << " -> " << (astronauts[i].isEligible() ? "ELIGIBLE" : "NOT ELIGIBLE") << "\n";
+                    cout << "  " << astronauts[i].getName() ;
+
+                    if (astronauts[i].isEligible()) {
+                        cout << "ELIGIBLE\n";
+                    }
+                    else {
+                        cout << "NOT ELIGIBLE\n";
+                    }
                 }
             }
         }
     } while (choice != 0);
 }
 
-// --- MENU 3 : Commanders ---
-void commanderMenu() {
+ 
+void commanderMenu() {                                      //  MENU 3
     int choice;
     do {
-        printHeader("COMMANDER MANAGEMENT");
+
         cout << "  [1] Add Commander\n"
-             << "  [2] Display All Commanders\n"
-             << "  [3] Combine Crew of First Two Commanders\n"
-             << "  [0] Back\n"
-             << "  Choice: ";
+            << "  [2] Display All Commanders\n"
+            << "  [0] Back\n"
+            << "  Choice: ";
         cin >> choice;
 
         if (choice == 1) {
-            if (commanderCount >= MAX_COMMANDERS) {
+           
+            if (commanders == nullptr) {
+                cout << "  Enter maximum number of commanders: ";
+                cin >> commanderCapacity;
+                commanders = new Commander[commanderCapacity];
+            }
+
+            if (commanderCount >= commanderCapacity) {
                 cout << "  Commander list is full!\n";
-            } else {
-                cout << "\n  --- Enter Commander Data ---\n";
+            }
+            else {
+              
                 commanders[commanderCount].input();
                 commanderCount++;
-                cout << "  Commander added successfully!\n";
+              
             }
         }
         else if (choice == 2) {
-            if (commanderCount == 0) { cout << "  No commanders added yet.\n"; }
+            if (commanderCount == 0) {
+                cout << "  No commanders added yet.\n";
+            }
             else {
                 for (int i = 0; i < commanderCount; i++) {
-                    cout << "\n  Commander #" << (i+1);
+                    cout << " Commander " << (i + 1);
                     commanders[i].display();
                 }
             }
         }
-        else if (choice == 3) {
-            if (commanderCount < 2) { cout << "  Need at least 2 commanders.\n"; }
-            else {
-                int total = commanders[0] + commanders[1];
-                cout << "  Combined crew of first two commanders: "
-                     << total << " members\n";
-            }
-        }
+       
     } while (choice != 0);
 }
 
-// --- MENU 4 : Mission Summary (Friend Function demo) ---
+
 void missionSummaryMenu() {
-    if (rocketCount == 0 || astronautCount == 0) {
-        cout << "  Please add at least one Rocket and one Astronaut first.\n";
+    if (rockets == nullptr || astronauts == nullptr || rocketCount == 0 || astronautCount == 0) {
+        cout << "  Please add at least one Rocket and one Astronaut first\n";
         return;
     }
-    cout << "\n  Using first rocket and first astronaut:\n";
+    cout << "  Using first rocket and first astronaut:\n";
     showMissionSummary(rockets[0], astronauts[0]);
 }
 
-// ============================================================
-//  MAIN
-// ============================================================
+
 int main() {
-    // Pre-load sample data so demo runs quickly
-    rockets[0]    = Rocket("Apollo-X",  101, 50.0, 8, 200.0, "Ready");
-    rockets[1]    = Rocket("StarBird",  102, 30.0, 5, 120.0, "Ready");
-    rocketCount   = 2;
-
-    astronauts[0] = Astronaut("Yara Nile",   201, 70.0, "Lieutenant", 5, 95.0);
-    astronauts[1] = Astronaut("Karim Orbit", 202, 80.0, "Sergeant",   2, 60.0);
-    astronautCount = 2;
-
-    commanders[0] = Commander("Laila Stars", 301, 68.0, "Colonel", 10, 99.0, "MISSION-ALPHA", 4);
-    commanders[1] = Commander("Tarek Void",  302, 75.0, "Major",    7, 88.0, "MISSION-BETA",  3);
-    commanderCount = 2;
+   
+    
 
     int choice;
     do {
-        printHeader("SPACE MISSION CONTROL SYSTEM");
+        
         cout << "  [1] Rocket Management\n"
              << "  [2] Astronaut Management\n"
              << "  [3] Commander Management\n"
@@ -404,14 +412,18 @@ int main() {
         cin >> choice;
 
         switch (choice) {
-            case 1: rocketMenu();         break;
-            case 2: astronautMenu();      break;
-            case 3: commanderMenu();      break;
-            case 4: missionSummaryMenu(); break;
-            case 0: cout << "  Goodbye! Stay in orbit.\n"; break;
+            case 1: rocketMenu();                         break;
+            case 2: astronautMenu();                      break;
+            case 3: commanderMenu();                      break;
+            case 4: missionSummaryMenu();                 break;
+            case 0: cout << "  Goodbye\n";                break;
             default: cout << "  Invalid choice.\n";
         }
     } while (choice != 0);
+
+    if (rockets != nullptr)     delete[] rockets;
+    if (astronauts != nullptr)  delete[] astronauts;
+    if (commanders != nullptr)  delete[] commanders;
 
     return 0;
 }
